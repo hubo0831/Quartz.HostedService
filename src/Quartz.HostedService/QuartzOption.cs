@@ -18,17 +18,27 @@ namespace Quartz.HostedService
 
         public NameValueCollection ToProperties()
         {
-            var properties = new NameValueCollection
+            var properties = new NameValueCollection();
+            if (this.Scheduler != null)
             {
-                ["quartz.scheduler.instanceName"] = Scheduler?.InstanceName,
-                ["quartz.threadPool.type"] = ThreadPool?.Type,
-                //["quartz.threadPool.threadPriority"] = ThreadPool?.ThreadPriority,
-                ["quartz.threadPool.threadCount"] = ThreadPool?.ThreadCount.ToString(),
-                ["quartz.plugin.jobInitializer.type"] = Plugin?.JobInitializer?.Type,
-                ["quartz.plugin.jobInitializer.fileNames"] = Plugin?.JobInitializer?.FileNames
-            };
-
+                AddProperty(properties, "quartz.scheduler.instanceName", this.Scheduler.InstanceName);
+            }
+            if (this.ThreadPool != null)
+            {
+                AddProperty(properties, "quartz.threadPool.type", this.ThreadPool.Type);
+                AddProperty(properties, "quartz.threadPool.threadCount", this.ThreadPool.ThreadCount.ToString());
+            }
+            if (this.Plugin != null)
+            {
+                AddProperty(properties, "quartz.plugin.jobInitializer.type", this.Plugin.JobInitializer?.Type);
+                AddProperty(properties, "quartz.plugin.jobInitializer.fileNames", this.Plugin.JobInitializer?.FileNames);
+            }
             return properties;
+        }
+        private void AddProperty(NameValueCollection properties, string key, string property)
+        {
+            if (string.IsNullOrEmpty(property)) return;
+            properties[key] = property;
         }
     }
 
